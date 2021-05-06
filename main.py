@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from flask import Flask, request, make_response, redirect, render_template, session, url_for
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
@@ -8,6 +9,13 @@ app = Flask(__name__, template_folder='./templates', static_folder='./static')
 bootstrap = Bootstrap(app)
 
 app.config['SECRET_KEY'] = 'SUPER SECRETO'
+=======
+from flask import Flask, request, make_response, redirect, render_template
+from flask_bootstrap import Bootstrap
+
+app = Flask(__name__, template_folder='./templates', static_folder='./static')
+bootstrap = Bootstrap(app)
+>>>>>>> 75f24efed722d4184861c3ef5bf6ac8f1fcf0f9c
 
 todos = ['Buy coffee', 'Send purchase request', 'Deliver video to producer']
 
