@@ -1,66 +1,97 @@
-<<<<<<< HEAD
-from flask import Flask, request, make_response, redirect, render_template, session, url_for
-from flask_bootstrap import Bootstrap
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired
+from flask import (
+    request,
+    make_response,
+    redirect,
+    render_template,
+    session,
+    url_for,
+    flash,
+)
+from flask_login import login_required, current_user
 
-app = Flask(__name__, template_folder='./templates', static_folder='./static')
-bootstrap = Bootstrap(app)
+import unittest
 
-app.config['SECRET_KEY'] = 'SUPER SECRETO'
-=======
-from flask import Flask, request, make_response, redirect, render_template
-from flask_bootstrap import Bootstrap
+from app import create_app
+from app.forms import TodoForm, DeleteTodoForm, UpdateTodoForm
+from app.firestore_service import get_todos, put_todo, delete_todo, update_todo
 
-app = Flask(__name__, template_folder='./templates', static_folder='./static')
-bootstrap = Bootstrap(app)
->>>>>>> 75f24efed722d4184861c3ef5bf6ac8f1fcf0f9c
+app = create_app()
+app.config["PRESERVE_CONTEXT_ON_EXCEPTION"] = True
 
-todos = ['Buy coffee', 'Send purchase request', 'Deliver video to producer']
 
-class LoginForm(FlaskForm):
-    username = StringField('Nombre de usuario', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    submit = SubmitField('Enviar')
+@app.cli.command()
+def test():
+    tests = unittest.TestLoader().discover("tests")
+    unittest.TextTestRunner().run(tests)
+
 
 @app.errorhandler(404)
 def not_found(error):
-    return render_template('404.html.j2', error=error)
+    return render_template("404.html", error=error)
+
 
 @app.errorhandler(500)
-def internal_server_error(error):
-    return render_template('500.html.j2', error=error)
+def server_error(error):
+    return render_template("500.html", error=error)
 
-@app.route('/')
+
+@app.route("/")
 def index():
     user_ip = request.remote_addr
 
-    response = make_response(redirect('/hello'))
-    session['user_ip'] = user_ip
+    response = make_response(redirect("/hello"))
+    # response.set_cookie("user_ip", user_ip)
+    session["user_ip"] = user_ip
 
     return response
 
-@app.route('/hello', methods=['GET', 'POST'])
+
+@app.route("/hello", methods=["GET", "POST"])
+@login_required
 def hello():
-    user_ip = session.get('user_ip')
-    login_form = LoginForm()
-    username = session.get('username')
+    # user_ip = request.cookies.get("user_ip")
+    user_ip = session.get("user_ip")
+    username = current_user.id
+    todo_form = TodoForm()
+    delete_form = DeleteTodoForm()
+    update_form = UpdateTodoForm()
 
     context = {
-        'user_ip': user_ip,
-        'todos': todos,
-        'login_form': login_form,
-        'username': username
+        "user_ip": user_ip,
+        "todos": get_todos(user_id=username),
+        "username": username,
+        "todo_form": todo_form,
+        "delete_form": delete_form,
+        "update_form": update_form,
     }
 
-    if login_form.validate_on_submit():
-        username = login_form.username.data
-        session['username'] = username
+    if todo_form.validate_on_submit():
+        put_todo(user_id=username, description=todo_form.description.data)
 
-        return redirect(url_for('index'))
+        flash("Tu tarea se creo con éxito!")
 
-    return render_template('hello.j2.html', **context)
+        return redirect(url_for("hello"))
 
-if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    return render_template("hello.html", **context)
+
+
+@app.route("/todos/delete/<todo_id>", methods=["POST"])
+def delete(todo_id):
+    user_id = current_user.id
+    delete_todo(user_id=user_id, todo_id=todo_id)
+
+    return redirect(url_for("hello"))
+
+
+@app.route("/todos/update/<todo_id>/<int:done>", methods=["GET", "POST"])
+def update(todo_id, done):
+    user_id = current_user.id
+
+    update_todo(user_id=user_id, todo_id=todo_id, done=done)
+
+    return redirect(url_for("hello"))
+
+
+@app.route("/error")
+def internal_server_error():
+    return 1 / 0

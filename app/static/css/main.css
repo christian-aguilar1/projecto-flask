@@ -1,0 +1,20 @@
+html * {
+  font-family: sans-serif;
+}
+
+.container {
+  margin-right: 5%;
+  margin-left: 5%;
+}
+
+.form {
+  padding-bottom: 5%;
+}
+
+.alert {
+  margin-left: 5%;
+}
+
+img {
+  max-width: 30px;
+}
