@@ -11,8 +11,12 @@ html * {
   padding-bottom: 5%;
 }
 
+.list-group {
+ margin-bottom: 10px;
+}
+
 .alert {
-  margin-left: 5%;
+  margin: 0px 40px 20px 40px;
 }
 
 img {

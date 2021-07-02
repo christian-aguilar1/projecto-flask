@@ -51,14 +51,15 @@ def index():
 def hello():
     # user_ip = request.cookies.get("user_ip")
     user_ip = session.get("user_ip")
-    username = current_user.id
+    email = current_user.id
+    username = current_user.username
     todo_form = TodoForm()
     delete_form = DeleteTodoForm()
     update_form = UpdateTodoForm()
 
     context = {
         "user_ip": user_ip,
-        "todos": get_todos(user_id=username),
+        "todos": get_todos(user_id=email),
         "username": username,
         "todo_form": todo_form,
         "delete_form": delete_form,
@@ -66,7 +67,7 @@ def hello():
     }
 
     if todo_form.validate_on_submit():
-        put_todo(user_id=username, description=todo_form.description.data)
+        put_todo(user_id=email, description=todo_form.description.data)
 
         flash("Tu tarea se creo con éxito!")
 
@@ -75,7 +76,7 @@ def hello():
     return render_template("hello.html", **context)
 
 
-@app.route("/todos/delete/<todo_id>", methods=["POST"])
+@app.route("/todos/delete/<todo_id>", methods=["GET", "POST"])
 def delete(todo_id):
     user_id = current_user.id
     delete_todo(user_id=user_id, todo_id=todo_id)

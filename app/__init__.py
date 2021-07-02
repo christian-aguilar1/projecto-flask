@@ -19,6 +19,7 @@ def load_user(username):
 def create_app():
     app = Flask(__name__)
     bootstrap = Bootstrap(app)
+    print(bootstrap)
 
     app.config.from_object(Config)
 

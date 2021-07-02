@@ -1,12 +1,20 @@
 from flask_wtf import FlaskForm
+from wtforms.fields.html5 import EmailField
 from wtforms.fields import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
 
 
 class LoginForm(FlaskForm):
+    email = EmailField("Correo Electronico", validators=[DataRequired()])
+    password = PasswordField("Contraseña", validators=[DataRequired()])
+    submit = SubmitField("Ingresar")
+
+
+class SignupForm(FlaskForm):
     username = StringField("Nombre de usuario", validators=[DataRequired()])
-    password = PasswordField("Password", validators=[DataRequired()])
-    submit = SubmitField("Enviar")
+    email = EmailField("Correo Electronico", validators=[DataRequired()])
+    password = PasswordField("Contraseña", validators=[DataRequired()])
+    submit = SubmitField("Registrar")
 
 
 class TodoForm(FlaskForm):

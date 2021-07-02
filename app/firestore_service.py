@@ -2,14 +2,9 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 
-project_id = "todo-app-312922"
+project_id = "todo-app-production-313415"
 credential = credentials.ApplicationDefault()
-firebase_admin.initialize_app(
-    credential,
-    {
-        "projectId": project_id,
-    },
-)
+firebase_admin.initialize_app(credential)
 
 db = firestore.client()
 
@@ -23,8 +18,8 @@ def get_user(user_id):
 
 
 def user_put(user_data):
-    user_ref = db.collection("users").document(user_data.username)
-    user_ref.set({"password": user_data.password})
+    user_ref = db.collection("users").document(user_data.email)
+    user_ref.set({"username": user_data.username, "password": user_data.password})
 
 
 def get_todos(user_id):

@@ -1,9 +1,23 @@
 {% import "bootstrap/wtf.html" as wtf %} 
 
 {% macro render_todo(todo, delete_form, update_form) %}
-    <li class="list-group-item">
+    <li class="list-group-item d-flex bd-highlight align-items-center">
         Descripción: {{todo.to_dict()["description"]}} 
-        <span class='badge
+        <div class="px-2 bd-highlight">
+            <a href="{{ url_for('delete', todo_id=todo.id) }}" class="btn btn-danger">
+                Borrar
+            </a>
+            <a href="{{ url_for('update', todo_id=todo.id, done=todo.to_dict()['done'])}}" 
+                class="btn btn-primary"
+                >
+                {% if todo.to_dict()['done'] %}
+                    Rehacer
+                {% else %}
+                    Tarea Terminada
+                {% endif %}
+            </a>
+        </div>
+        <span class='badge ml-auto bd-highlight
                {%if todo.to_dict().done %}
                  badge-success
                {% else %}
@@ -15,20 +29,5 @@
                 To do
             {% endif %}
             </span> 
-        
-        <div>
-            <a href="{{ url_for('delete', todo_id=todo.id) }}" class="btn d-inline-block btn-danger">
-                Borrar
-            </a>
-            <a href="{{ url_for('update', todo_id=todo.id, done=todo.to_dict()['done'])}}" 
-                class="btn d-inline-block btn-primary"
-                >
-                {% if todo.to_dict()['done'] %}
-                    Rehacer
-                {% else %}
-                    Tarea Terminada
-                {% endif %}
-            </a>
-        </div>
     </li>
 {% endmacro %}
